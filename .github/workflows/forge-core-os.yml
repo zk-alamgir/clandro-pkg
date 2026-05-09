@@ -6,8 +6,8 @@ on:
 jobs:
   build-core:
     runs-on: ubuntu-latest
-    # THIS IS THE BYPASS. We run everything inside Termux's official pre-built container.
-    # No setup scripts. No missing Python. The compilers are already inside.
+    # THIS IS THE BYPASS: We boot the official Docker container natively.
+    # No setup scripts. No Jammy. No missing Python.
     container:
       image: ghcr.io/termux/package-builder:latest
     steps:
