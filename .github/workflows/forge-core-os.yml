@@ -5,37 +5,43 @@ on:
 
 jobs:
   build-core:
-    runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/termux/package-builder:latest
-      options: --privileged
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout Sovereign Code
         uses: actions/checkout@v4
 
-      - name: Architect the Custom OS Directories
-        run: |
-          # Create the missing Android paths so the C++ compiler doesn't crash
-          mkdir -p /data/data/com.zk.clandro/files/usr
-          mkdir -p /data/data/com.zk.clandro/files/home
+      - name: Free Disk Space (Maximize Build RAM)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: true
 
-      - name: Forge Tier 1 Packages (Native Execution)
+      - name: Sever Cloud Ties
         run: |
-          # We are already the 'builder' user. We just point HOME and fire the forge!
-          export HOME=/home/builder
-          
-          ./build-package.sh -I -a aarch64 bash
-          ./build-package.sh -I -a aarch64 coreutils
-          ./build-package.sh -I -a aarch64 dpkg
-          ./build-package.sh -I -a aarch64 apt
-          ./build-package.sh -I -a aarch64 ncurses
-          ./build-package.sh -I -a aarch64 readline
-          ./build-package.sh -I -a aarch64 termux-tools
-          ./build-package.sh -I -a aarch64 ca-certificates
+          # Mutate the build scripts so they never pull Termux's official pre-built image
+          sed -i 's|ghcr.io/termux/package-builder:latest|cl-andro-builder:latest|g' scripts/build-docker-image.sh scripts/run-docker.sh || true
+          sed -i 's|ghcr.io/termux/package-builder|cl-andro-builder|g' scripts/build-docker-image.sh scripts/run-docker.sh || true
+
+      - name: Forge the DNA Chamber (Custom Docker Image)
+        run: |
+          # This takes ~10 minutes. It builds a completely fresh Docker container 
+          # that permanently bakes com.zk.clandro into the Android C++ compilers.
+          sudo ./scripts/build-docker-image.sh
+
+      - name: Forge Tier 1 Packages
+        run: |
+          # Now we run the builds natively through our custom container!
+          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 bash
+          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 coreutils
+          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 dpkg
+          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 apt
+          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 ncurses
+          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 readline
+          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 termux-tools
+          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 ca-certificates
 
       - name: Generate APT Index
         run: |
-          export HOME=/home/builder
           sudo apt-get update && sudo apt-get install -y dpkg-dev
           mkdir -p output
           cd output
