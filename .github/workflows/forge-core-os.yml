@@ -15,30 +15,28 @@ jobs:
 
       - name: Architect the Custom OS Directories
         run: |
-          # 1. Create the new custom paths at the root of the container
+          # Create the missing Android paths so the C++ compiler doesn't crash
           mkdir -p /data/data/com.zk.clandro/files/usr
           mkdir -p /data/data/com.zk.clandro/files/home
-          
-          # 2. Hand ownership of the OS and the workspace to the compiler user
-          chown -R builder:builder /data/data/com.zk.clandro
-          chown -R builder:builder .
 
-      - name: Forge Tier 1 Packages (Secure Execution)
+      - name: Forge Tier 1 Packages (Native Execution)
         run: |
-          # 3. We execute the builds specifically as the 'builder' user. 
-          # This guarantees the C++ compiler has the exact permissions it expects.
-          sudo -E -u builder env HOME=/home/builder ./build-package.sh -I -a aarch64 bash
-          sudo -E -u builder env HOME=/home/builder ./build-package.sh -I -a aarch64 coreutils
-          sudo -E -u builder env HOME=/home/builder ./build-package.sh -I -a aarch64 dpkg
-          sudo -E -u builder env HOME=/home/builder ./build-package.sh -I -a aarch64 apt
-          sudo -E -u builder env HOME=/home/builder ./build-package.sh -I -a aarch64 ncurses
-          sudo -E -u builder env HOME=/home/builder ./build-package.sh -I -a aarch64 readline
-          sudo -E -u builder env HOME=/home/builder ./build-package.sh -I -a aarch64 termux-tools
-          sudo -E -u builder env HOME=/home/builder ./build-package.sh -I -a aarch64 ca-certificates
+          # We are already the 'builder' user. We just point HOME and fire the forge!
+          export HOME=/home/builder
+          
+          ./build-package.sh -I -a aarch64 bash
+          ./build-package.sh -I -a aarch64 coreutils
+          ./build-package.sh -I -a aarch64 dpkg
+          ./build-package.sh -I -a aarch64 apt
+          ./build-package.sh -I -a aarch64 ncurses
+          ./build-package.sh -I -a aarch64 readline
+          ./build-package.sh -I -a aarch64 termux-tools
+          ./build-package.sh -I -a aarch64 ca-certificates
 
       - name: Generate APT Index
         run: |
-          apt-get update && apt-get install -y dpkg-dev
+          export HOME=/home/builder
+          sudo apt-get update && sudo apt-get install -y dpkg-dev
           mkdir -p output
           cd output
           dpkg-scanpackages -m . > Packages
