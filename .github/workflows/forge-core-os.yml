@@ -8,31 +8,37 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/termux/package-builder:latest
-      # THE MASTER KEY: Gives the container permission to use FUSE filesystems
       options: --privileged
     steps:
       - name: Checkout Sovereign Code
         uses: actions/checkout@v4
 
-      - name: Fix Workspace Permissions
-        run: sudo chown -R builder:builder . || true
-
-      - name: Forge Tier 1 Packages
+      - name: Architect the Custom OS Directories
         run: |
-          export HOME=/home/builder
+          # 1. Create the new custom paths at the root of the container
+          mkdir -p /data/data/com.zk.clandro/files/usr
+          mkdir -p /data/data/com.zk.clandro/files/home
           
-          ./build-package.sh -I -a aarch64 bash
-          ./build-package.sh -I -a aarch64 coreutils
-          ./build-package.sh -I -a aarch64 dpkg
-          ./build-package.sh -I -a aarch64 apt
-          ./build-package.sh -I -a aarch64 ncurses
-          ./build-package.sh -I -a aarch64 readline
-          ./build-package.sh -I -a aarch64 termux-tools
-          ./build-package.sh -I -a aarch64 ca-certificates
+          # 2. Hand ownership of the OS and the workspace to the compiler user
+          chown -R builder:builder /data/data/com.zk.clandro
+          chown -R builder:builder .
+
+      - name: Forge Tier 1 Packages (Secure Execution)
+        run: |
+          # 3. We execute the builds specifically as the 'builder' user. 
+          # This guarantees the C++ compiler has the exact permissions it expects.
+          sudo -E -u builder env HOME=/home/builder ./build-package.sh -I -a aarch64 bash
+          sudo -E -u builder env HOME=/home/builder ./build-package.sh -I -a aarch64 coreutils
+          sudo -E -u builder env HOME=/home/builder ./build-package.sh -I -a aarch64 dpkg
+          sudo -E -u builder env HOME=/home/builder ./build-package.sh -I -a aarch64 apt
+          sudo -E -u builder env HOME=/home/builder ./build-package.sh -I -a aarch64 ncurses
+          sudo -E -u builder env HOME=/home/builder ./build-package.sh -I -a aarch64 readline
+          sudo -E -u builder env HOME=/home/builder ./build-package.sh -I -a aarch64 termux-tools
+          sudo -E -u builder env HOME=/home/builder ./build-package.sh -I -a aarch64 ca-certificates
 
       - name: Generate APT Index
         run: |
-          export HOME=/home/builder
+          apt-get update && apt-get install -y dpkg-dev
           mkdir -p output
           cd output
           dpkg-scanpackages -m . > Packages
