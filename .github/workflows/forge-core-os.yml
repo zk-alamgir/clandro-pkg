@@ -28,7 +28,7 @@ jobs:
         run: |
           export HOME=/home/builder
           
-          # 1. Fill the empty room with the core C libraries FIRST (with -I to prevent the 20GB chain)
+          # 1. Fill the empty room with the core C libraries FIRST
           ./build-package.sh -I -a aarch64 ndk-sysroot
           ./build-package.sh -I -a aarch64 libandroid-support
           
@@ -36,7 +36,16 @@ jobs:
           ./build-package.sh -I -a aarch64 ncurses
           ./build-package.sh -I -a aarch64 readline
           
-          # 3. Forge the sovereign OS tools natively
+          # 3. Forge Crypto & Compression (The Missing dpkg/apt Keys)
+          ./build-package.sh -I -a aarch64 zlib
+          ./build-package.sh -I -a aarch64 liblzma
+          ./build-package.sh -I -a aarch64 libbz2
+          ./build-package.sh -I -a aarch64 libmd
+          ./build-package.sh -I -a aarch64 openssl
+          ./build-package.sh -I -a aarch64 libgpg-error
+          ./build-package.sh -I -a aarch64 libgcrypt
+          
+          # 4. Forge the sovereign OS tools natively
           ./build-package.sh -I -a aarch64 bash
           ./build-package.sh -I -a aarch64 coreutils
           ./build-package.sh -I -a aarch64 dpkg
