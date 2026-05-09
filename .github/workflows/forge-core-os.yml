@@ -58,6 +58,7 @@ jobs:
           ./build-package.sh -I -a aarch64 libexpat
           ./build-package.sh -I -a aarch64 libcrypt
           ./build-package.sh -I -a aarch64 gdbm
+          ./build-package.sh -I -a aarch64 libandroid-posix-semaphore
           ./build-package.sh -I -a aarch64 python
           
           # 5. Forge Documentation & XML Parsers (For APT Manuals)
