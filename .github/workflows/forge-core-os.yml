@@ -5,7 +5,7 @@ on:
 
 jobs:
   build-core:
-    runs-on: ubuntu-24.04 # Upgraded to Noble Numbat
+    runs-on: ubuntu-latest # It doesn't matter what OS GitHub gives us anymore
     steps:
       - name: Checkout Sovereign Code
         uses: actions/checkout@v4
@@ -16,25 +16,30 @@ jobs:
           tool-cache: true
           android: true
 
-      - name: Setup Master Environment & NDK
+      - name: Download Android NDK (The Missing Link)
         run: |
-          # The script will now find python3.12 and libclang-rt-17 easily
-          sudo ./scripts/setup-ubuntu.sh
+          # This script ONLY downloads the NDK. It does not use apt-get.
+          # It completely bypasses the Ubuntu 22.04 vs 24.04 error.
+          ./scripts/setup-android-sdk.sh
 
-      - name: Forge Tier 1 Packages
+      - name: Forge Tier 1 Packages (Inside Isolated Docker)
         run: |
-          ./build-package.sh -I -a aarch64 bash
-          ./build-package.sh -I -a aarch64 coreutils
-          ./build-package.sh -I -a aarch64 dpkg
-          ./build-package.sh -I -a aarch64 apt
-          ./build-package.sh -I -a aarch64 ncurses
-          ./build-package.sh -I -a aarch64 readline
-          ./build-package.sh -I -a aarch64 termux-tools
-          ./build-package.sh -I -a aarch64 ca-certificates
+          # This spins up Termux's official isolated 24.04 container,
+          # mounts the NDK we just downloaded, and compiles safely inside it.
+          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 bash
+          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 coreutils
+          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 dpkg
+          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 apt
+          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 ncurses
+          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 readline
+          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 termux-tools
+          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 ca-certificates
 
       - name: Generate APT Index
         run: |
           sudo apt-get update && sudo apt-get install -y dpkg-dev
+          # The docker container spits the compiled .deb files into the output folder
+          mkdir -p output
           cd output
           dpkg-scanpackages -m . > Packages
           gzip -9c Packages > Packages.gz
