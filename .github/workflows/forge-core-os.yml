@@ -6,8 +6,6 @@ on:
 jobs:
   build-core:
     runs-on: ubuntu-latest
-    # THIS IS THE BYPASS: We boot the official Docker container natively.
-    # No setup scripts. No Jammy. No missing Python.
     container:
       image: ghcr.io/termux/package-builder:latest
     steps:
@@ -15,10 +13,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Fix Workspace Permissions
-        run: sudo chown -R builder:builder . || true
+        run: chown -R builder:builder . || true
 
       - name: Forge Tier 1 Packages
         run: |
+          # The surgical fix: Point the script to the pre-installed container tools
+          export HOME=/home/builder
+          
           ./build-package.sh -I -a aarch64 bash
           ./build-package.sh -I -a aarch64 coreutils
           ./build-package.sh -I -a aarch64 dpkg
@@ -30,6 +31,7 @@ jobs:
 
       - name: Generate APT Index
         run: |
+          export HOME=/home/builder
           mkdir -p output
           cd output
           dpkg-scanpackages -m . > Packages
