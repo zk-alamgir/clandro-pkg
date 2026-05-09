@@ -1,7 +1,7 @@
 name: Forge Core OS (aarch64)
 
 on:
-  workflow_dispatch: # Allows you to manually trigger this build via a button
+  workflow_dispatch:
 
 jobs:
   build-core:
@@ -18,18 +18,17 @@ jobs:
           dotnet: true
           haskell: true
 
-      - name: Forge Tier 1 Packages (The Bootstrap)
+      - name: Forge Tier 1 Packages (Inside Official Docker Environment)
         run: |
-          # Termux's build script automatically spins up its own Docker container.
-          # We compile only the absolute minimum required for a booting shell and package manager.
-          ./build-package.sh -a aarch64 bash
-          ./build-package.sh -a aarch64 coreutils
-          ./build-package.sh -a aarch64 dpkg
-          ./build-package.sh -a aarch64 apt
-          ./build-package.sh -a aarch64 ncurses
-          ./build-package.sh -a aarch64 readline
-          ./build-package.sh -a aarch64 termux-tools
-          ./build-package.sh -a aarch64 ca-certificates
+          # We wrap the commands in run-docker.sh to use the pre-configured NDK environment
+          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 bash
+          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 coreutils
+          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 dpkg
+          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 apt
+          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 ncurses
+          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 readline
+          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 termux-tools
+          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 ca-certificates
 
       - name: Generate APT Index (The Repository Map)
         run: |
