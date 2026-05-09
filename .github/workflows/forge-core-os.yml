@@ -1,0 +1,45 @@
+name: Forge Core OS (aarch64)
+
+on:
+  workflow_dispatch: # Allows you to manually trigger this build via a button
+
+jobs:
+  build-core:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Sovereign Code
+        uses: actions/checkout@v4
+
+      - name: Free Disk Space (Maximize Build RAM)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+
+      - name: Forge Tier 1 Packages (The Bootstrap)
+        run: |
+          # Termux's build script automatically spins up its own Docker container.
+          # We compile only the absolute minimum required for a booting shell and package manager.
+          ./build-package.sh -a aarch64 bash
+          ./build-package.sh -a aarch64 coreutils
+          ./build-package.sh -a aarch64 dpkg
+          ./build-package.sh -a aarch64 apt
+          ./build-package.sh -a aarch64 ncurses
+          ./build-package.sh -a aarch64 readline
+          ./build-package.sh -a aarch64 termux-tools
+          ./build-package.sh -a aarch64 ca-certificates
+
+      - name: Generate APT Index (The Repository Map)
+        run: |
+          sudo apt-get update && sudo apt-get install -y dpkg-dev
+          cd output
+          dpkg-scanpackages -m . > Packages
+          gzip -9c Packages > Packages.gz
+
+      - name: Upload Core OS Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cl-andro-core-debs-aarch64
+          path: output/
