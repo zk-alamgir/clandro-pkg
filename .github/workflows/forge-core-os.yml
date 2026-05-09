@@ -53,7 +53,9 @@ jobs:
           
           # 4. Forge the Python Engine
           ./build-package.sh -I -a aarch64 libffi
-          ./build-package.sh -I -a aarch64 sqlite
+          ./build-package.sh -I -a aarch64 libsqlite
+          ./build-package.sh -I -a aarch64 libexpat
+          ./build-package.sh -I -a aarch64 libcrypt
           ./build-package.sh -I -a aarch64 gdbm
           ./build-package.sh -I -a aarch64 python
           
