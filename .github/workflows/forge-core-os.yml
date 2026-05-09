@@ -5,7 +5,7 @@ on:
 
 jobs:
   build-core:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04 # Use a stable Ubuntu version
     steps:
       - name: Checkout Sovereign Code
         uses: actions/checkout@v4
@@ -18,17 +18,22 @@ jobs:
           dotnet: true
           haskell: true
 
-      - name: Forge Tier 1 Packages (Inside Official Docker Environment)
+      - name: Setup Master Environment & NDK
         run: |
-          # We wrap the commands in run-docker.sh to use the pre-configured NDK environment
-          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 bash
-          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 coreutils
-          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 dpkg
-          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 apt
-          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 ncurses
-          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 readline
-          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 termux-tools
-          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 ca-certificates
+          # This official script downloads the exact Android NDK and sets up the environment
+          sudo ./scripts/setup-ubuntu.sh
+
+      - name: Forge Tier 1 Packages (The Bootstrap)
+        run: |
+          # Now the NDK is installed, we can compile the core OS directly
+          ./build-package.sh -I -a aarch64 bash
+          ./build-package.sh -I -a aarch64 coreutils
+          ./build-package.sh -I -a aarch64 dpkg
+          ./build-package.sh -I -a aarch64 apt
+          ./build-package.sh -I -a aarch64 ncurses
+          ./build-package.sh -I -a aarch64 readline
+          ./build-package.sh -I -a aarch64 termux-tools
+          ./build-package.sh -I -a aarch64 ca-certificates
 
       - name: Generate APT Index (The Repository Map)
         run: |
