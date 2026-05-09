@@ -15,32 +15,34 @@ jobs:
 
       - name: Architect the Custom OS Directories
         run: |
-          # FUSE requires the destination directories to physically exist before mounting.
-          # We use sudo (as root) to create them, then hand them to the builder user.
           sudo mkdir -p /data/data/com.zk.clandro/files/usr
           sudo mkdir -p /data/data/com.zk.clandro/files/home
           sudo chown -R builder:builder /data/data/com.zk.clandro
 
       - name: Install the C++ Compiler (The Missing NDK)
         run: |
-          # The Docker image is empty. We must download the Android NDK locally inside it.
-          # Pointing HOME ensures the compiler is installed exactly where the build script expects it.
           export HOME=/home/builder
           ./scripts/setup-android-sdk.sh
+
+      - name: Forge the Bedrock (Core Libraries)
+        run: |
+          export HOME=/home/builder
+          # We explicitly build the system roots first without the Ignore (-I) flag.
+          # This puts libc.so and the compiler tools into your clandro prefix!
+          ./build-package.sh -a aarch64 ndk-sysroot
+          ./build-package.sh -a aarch64 libandroid-support
 
       - name: Forge Tier 1 Packages (Native Execution)
         run: |
           export HOME=/home/builder
-          
-          # The FUSE filesystem is ready, and the compilers are loaded. Forge the OS.
-          ./build-package.sh -I -a aarch64 bash
-          ./build-package.sh -I -a aarch64 coreutils
-          ./build-package.sh -I -a aarch64 dpkg
-          ./build-package.sh -I -a aarch64 apt
-          ./build-package.sh -I -a aarch64 ncurses
-          ./build-package.sh -I -a aarch64 readline
-          ./build-package.sh -I -a aarch64 termux-tools
-          ./build-package.sh -I -a aarch64 ca-certificates
+          # Now the compiler has a foundation to stand on. We build the rest.
+          # Removing -I allows it to naturally build ncurses and readline for bash.
+          ./build-package.sh -a aarch64 bash
+          ./build-package.sh -a aarch64 coreutils
+          ./build-package.sh -a aarch64 dpkg
+          ./build-package.sh -a aarch64 apt
+          ./build-package.sh -a aarch64 termux-tools
+          ./build-package.sh -a aarch64 ca-certificates
 
       - name: Generate APT Index
         run: |
