@@ -5,40 +5,33 @@ on:
 
 jobs:
   build-core:
-    runs-on: ubuntu-latest # It doesn't matter what OS GitHub gives us anymore
+    runs-on: ubuntu-latest
+    # THIS IS THE BYPASS. We run the entire job INSIDE Termux's official builder environment.
+    # No setup scripts required. The NDK and Python 3.12 are already baked into this image.
+    container:
+      image: ghcr.io/termux/package-builder:latest
     steps:
       - name: Checkout Sovereign Code
         uses: actions/checkout@v4
 
-      - name: Free Disk Space
-        uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: true
-          android: true
+      - name: Fix Workspace Permissions
+        run: sudo chown -R $(whoami) .
 
-      - name: Download Android NDK (The Missing Link)
+      - name: Forge Tier 1 Packages (Direct Compile)
         run: |
-          # This script ONLY downloads the NDK. It does not use apt-get.
-          # It completely bypasses the Ubuntu 22.04 vs 24.04 error.
-          ./scripts/setup-android-sdk.sh
-
-      - name: Forge Tier 1 Packages (Inside Isolated Docker)
-        run: |
-          # This spins up Termux's official isolated 24.04 container,
-          # mounts the NDK we just downloaded, and compiles safely inside it.
-          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 bash
-          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 coreutils
-          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 dpkg
-          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 apt
-          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 ncurses
-          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 readline
-          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 termux-tools
-          ./scripts/run-docker.sh ./build-package.sh -I -a aarch64 ca-certificates
+          # The compilers are already installed. We just run the builds directly.
+          ./build-package.sh -I -a aarch64 bash
+          ./build-package.sh -I -a aarch64 coreutils
+          ./build-package.sh -I -a aarch64 dpkg
+          ./build-package.sh -I -a aarch64 apt
+          ./build-package.sh -I -a aarch64 ncurses
+          ./build-package.sh -I -a aarch64 readline
+          ./build-package.sh -I -a aarch64 termux-tools
+          ./build-package.sh -I -a aarch64 ca-certificates
 
       - name: Generate APT Index
         run: |
-          sudo apt-get update && sudo apt-get install -y dpkg-dev
-          # The docker container spits the compiled .deb files into the output folder
+          sudo apt-get update && sudo apt-get install -y dpkg-dev || true
           mkdir -p output
           cd output
           dpkg-scanpackages -m . > Packages
