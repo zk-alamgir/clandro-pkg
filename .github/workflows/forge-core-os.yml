@@ -8,16 +8,17 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/termux/package-builder:latest
+      # THE MASTER KEY: Gives the container permission to use FUSE filesystems
+      options: --privileged
     steps:
       - name: Checkout Sovereign Code
         uses: actions/checkout@v4
 
       - name: Fix Workspace Permissions
-        run: chown -R builder:builder . || true
+        run: sudo chown -R builder:builder . || true
 
       - name: Forge Tier 1 Packages
         run: |
-          # The surgical fix: Point the script to the pre-installed container tools
           export HOME=/home/builder
           
           ./build-package.sh -I -a aarch64 bash
