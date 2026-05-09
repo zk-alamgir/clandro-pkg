@@ -51,7 +51,13 @@ jobs:
           ./build-package.sh -I -a aarch64 libdb
           ./build-package.sh -I -a aarch64 xxhash
           
-          # 4. Forge the sovereign OS tools natively
+          # 4. Forge Documentation & XML Parsers (For APT Manuals)
+          ./build-package.sh -I -a aarch64 libxml2
+          ./build-package.sh -I -a aarch64 libxslt
+          ./build-package.sh -I -a aarch64 docbook-xml
+          ./build-package.sh -I -a aarch64 docbook-xsl
+          
+          # 5. Forge the sovereign OS tools natively
           ./build-package.sh -I -a aarch64 bash
           ./build-package.sh -I -a aarch64 coreutils
           ./build-package.sh -I -a aarch64 dpkg
