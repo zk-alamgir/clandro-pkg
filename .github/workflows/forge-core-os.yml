@@ -5,27 +5,24 @@ on:
 
 jobs:
   build-core:
-    runs-on: ubuntu-22.04 # Use a stable Ubuntu version
+    runs-on: ubuntu-24.04 # Upgraded to Noble Numbat
     steps:
       - name: Checkout Sovereign Code
         uses: actions/checkout@v4
 
-      - name: Free Disk Space (Maximize Build RAM)
+      - name: Free Disk Space
         uses: jlumbroso/free-disk-space@main
         with:
           tool-cache: true
           android: true
-          dotnet: true
-          haskell: true
 
       - name: Setup Master Environment & NDK
         run: |
-          # This official script downloads the exact Android NDK and sets up the environment
+          # The script will now find python3.12 and libclang-rt-17 easily
           sudo ./scripts/setup-ubuntu.sh
 
-      - name: Forge Tier 1 Packages (The Bootstrap)
+      - name: Forge Tier 1 Packages
         run: |
-          # Now the NDK is installed, we can compile the core OS directly
           ./build-package.sh -I -a aarch64 bash
           ./build-package.sh -I -a aarch64 coreutils
           ./build-package.sh -I -a aarch64 dpkg
@@ -35,7 +32,7 @@ jobs:
           ./build-package.sh -I -a aarch64 termux-tools
           ./build-package.sh -I -a aarch64 ca-certificates
 
-      - name: Generate APT Index (The Repository Map)
+      - name: Generate APT Index
         run: |
           sudo apt-get update && sudo apt-get install -y dpkg-dev
           cd output
