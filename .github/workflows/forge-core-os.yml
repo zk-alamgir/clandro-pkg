@@ -38,7 +38,7 @@ jobs:
           ./build-package.sh -I -a aarch64 ncurses
           ./build-package.sh -I -a aarch64 readline
           
-          # 3. Forge Crypto & Compression
+          # 3. Forge Crypto, Compression & Databases
           ./build-package.sh -I -a aarch64 zlib
           ./build-package.sh -I -a aarch64 liblzma
           ./build-package.sh -I -a aarch64 libbz2
@@ -46,8 +46,9 @@ jobs:
           ./build-package.sh -I -a aarch64 openssl
           ./build-package.sh -I -a aarch64 libgpg-error
           ./build-package.sh -I -a aarch64 libgcrypt
+          ./build-package.sh -I -a aarch64 libdb
           
-          # 4. Forge the sovereign OS tools
+          # 4. Forge the sovereign OS tools natively
           ./build-package.sh -I -a aarch64 bash
           ./build-package.sh -I -a aarch64 coreutils
           ./build-package.sh -I -a aarch64 dpkg
