@@ -51,8 +51,9 @@ jobs:
           ./build-package.sh -I -a aarch64 libdb
           ./build-package.sh -I -a aarch64 xxhash
           
-          # 4. Forge the Python Engine
+          # 4. Forge the Python Engine & Database Tools
           ./build-package.sh -I -a aarch64 libffi
+          ./build-package.sh -I -a aarch64 tcl
           ./build-package.sh -I -a aarch64 libsqlite
           ./build-package.sh -I -a aarch64 libexpat
           ./build-package.sh -I -a aarch64 libcrypt
