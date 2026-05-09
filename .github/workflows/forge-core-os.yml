@@ -31,6 +31,7 @@ jobs:
           # 1. Fill the empty room with the core C libraries FIRST
           ./build-package.sh -I -a aarch64 ndk-sysroot
           ./build-package.sh -I -a aarch64 libandroid-support
+          ./build-package.sh -I -a aarch64 libandroid-glob
           
           # 2. Build the direct requirements for the shell
           ./build-package.sh -I -a aarch64 ncurses
