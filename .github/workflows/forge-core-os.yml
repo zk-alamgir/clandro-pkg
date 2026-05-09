@@ -42,6 +42,8 @@ jobs:
           ./build-package.sh -I -a aarch64 zlib
           ./build-package.sh -I -a aarch64 liblzma
           ./build-package.sh -I -a aarch64 libbz2
+          ./build-package.sh -I -a aarch64 liblz4
+          ./build-package.sh -I -a aarch64 zstd
           ./build-package.sh -I -a aarch64 libmd
           ./build-package.sh -I -a aarch64 openssl
           ./build-package.sh -I -a aarch64 libgpg-error
