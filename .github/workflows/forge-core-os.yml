@@ -24,25 +24,25 @@ jobs:
           export HOME=/home/builder
           ./scripts/setup-android-sdk.sh
 
-      - name: Forge the Bedrock (Core Libraries)
+      - name: Forge the Bedrock & Core OS (Surgical Execution)
         run: |
           export HOME=/home/builder
-          # We explicitly build the system roots first without the Ignore (-I) flag.
-          # This puts libc.so and the compiler tools into your clandro prefix!
-          ./build-package.sh -a aarch64 ndk-sysroot
-          ./build-package.sh -a aarch64 libandroid-support
-
-      - name: Forge Tier 1 Packages (Native Execution)
-        run: |
-          export HOME=/home/builder
-          # Now the compiler has a foundation to stand on. We build the rest.
-          # Removing -I allows it to naturally build ncurses and readline for bash.
-          ./build-package.sh -a aarch64 bash
-          ./build-package.sh -a aarch64 coreutils
-          ./build-package.sh -a aarch64 dpkg
-          ./build-package.sh -a aarch64 apt
-          ./build-package.sh -a aarch64 termux-tools
-          ./build-package.sh -a aarch64 ca-certificates
+          
+          # 1. Fill the empty room with the core C libraries FIRST (with -I to prevent the 20GB chain)
+          ./build-package.sh -I -a aarch64 ndk-sysroot
+          ./build-package.sh -I -a aarch64 libandroid-support
+          
+          # 2. Build the direct requirements for the shell
+          ./build-package.sh -I -a aarch64 ncurses
+          ./build-package.sh -I -a aarch64 readline
+          
+          # 3. Forge the sovereign OS tools natively
+          ./build-package.sh -I -a aarch64 bash
+          ./build-package.sh -I -a aarch64 coreutils
+          ./build-package.sh -I -a aarch64 dpkg
+          ./build-package.sh -I -a aarch64 apt
+          ./build-package.sh -I -a aarch64 termux-tools
+          ./build-package.sh -I -a aarch64 ca-certificates
 
       - name: Generate APT Index
         run: |
