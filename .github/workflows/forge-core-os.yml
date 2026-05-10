@@ -60,10 +60,10 @@ jobs:
           ./build-package.sh -I -a aarch64 gdbm
           ./build-package.sh -I -a aarch64 libandroid-posix-semaphore
           
-          # ARCHITECT OVERRIDE: Obliterate GUI dependencies across the entire index
+          # ARCHITECT OVERRIDE: Obliterate GUI dependencies safely (Regular Files Only)
           rm -f packages/python/*tkinter*.sh
           find packages -name "*fetchmailconf*" -exec rm -rf {} +
-          find packages -name "*.sh" -exec sed -i 's/python-tkinter//g' {} +
+          find packages -type f -name "*.sh" -exec sed -i 's/python-tkinter//g' {} +
           sed -i 's/termux_error_exit "Python module library/echo "Bypassed GUI check: /g' packages/python/build.sh
           
           ./build-package.sh -I -a aarch64 python
