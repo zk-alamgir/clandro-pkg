@@ -90,11 +90,10 @@ jobs:
           mkdir -p output
           cd output
           
-          # ARCHITECT OVERRIDE: Remove colons from filenames so GitHub Artifacts can upload them safely
-          for f in *.deb; do
-            if [[ "$f" == *":"* ]]; then
-              mv "$f" "${f//:/_}"
-            fi
+          # ARCHITECT OVERRIDE: Bulletproof POSIX renaming to bypass GitHub's Windows NTFS restrictions
+          find . -name "*:*" -type f | while read -r file; do
+            newfile=$(echo "$file" | tr ':' '_')
+            mv "$file" "$newfile"
           done
           
           dpkg-scanpackages -m . > Packages
