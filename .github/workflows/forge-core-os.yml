@@ -89,6 +89,14 @@ jobs:
           sudo apt-get update && sudo apt-get install -y dpkg-dev
           mkdir -p output
           cd output
+          
+          # ARCHITECT OVERRIDE: Remove colons from filenames so GitHub Artifacts can upload them safely
+          for f in *.deb; do
+            if [[ "$f" == *":"* ]]; then
+              mv "$f" "${f//:/_}"
+            fi
+          done
+          
           dpkg-scanpackages -m . > Packages
           gzip -9c Packages > Packages.gz
 
