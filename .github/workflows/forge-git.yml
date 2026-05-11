@@ -47,6 +47,14 @@ jobs:
           # 4. Forge Git
           ./build-package.sh -I -a aarch64 git
 
+      - name: Sanitize Artifact Filenames
+        if: success()
+        run: |
+          # Find any .deb file with a colon and replace the colon with an underscore
+          for f in output/*:*.deb; do
+            [ -e "$f" ] && mv "$f" "${f//:/_}"
+          done
+
       - name: The Autopsy (Catch the Crash)
         if: failure()
         run: |
