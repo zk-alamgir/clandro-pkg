@@ -1,0 +1,36 @@
+name: Forge Coreutils (Surgical Strike)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-coreutils:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/termux/package-builder:latest
+      options: --privileged
+    steps:
+      - name: Checkout Sovereign Code
+        uses: actions/checkout@v4
+
+      - name: Architect the Custom OS Directories
+        run: |
+          sudo mkdir -p /data/data/com.zk.clandro/files/usr
+          sudo chown -R builder:builder /data/data/com.zk.clandro
+
+      - name: Install NDK
+        run: |
+          export HOME=/home/builder
+          ./scripts/setup-android-sdk.sh
+
+      - name: Forge Coreutils
+        run: |
+          export HOME=/home/builder
+          # The -I flag forces it to build any missing dependencies (like libgmp)
+          ./build-package.sh -I -a aarch64 coreutils
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cl-andro-coreutils
+          path: output/*.deb
