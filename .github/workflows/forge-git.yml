@@ -27,11 +27,17 @@ jobs:
         run: |
           export HOME=/home/builder
           
-          # 1. The Bedrock (Required for C-linking)
+          # 1. The C Bedrock
           ./build-package.sh -I -a aarch64 ndk-sysroot
           ./build-package.sh -I -a aarch64 libandroid-support
+          ./build-package.sh -I -a aarch64 libiconv
           
-          # 2. Forge Git (The -I flag will automatically build libcurl and openssl)
+          # 2. Network & Crypto Bedrock (The Missing Keys)
+          ./build-package.sh -I -a aarch64 zlib
+          ./build-package.sh -I -a aarch64 openssl
+          ./build-package.sh -I -a aarch64 libcurl
+          
+          # 3. Forge Git
           ./build-package.sh -I -a aarch64 git
 
       - name: The Autopsy (Catch the Crash)
