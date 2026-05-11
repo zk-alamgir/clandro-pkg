@@ -27,17 +27,25 @@ jobs:
         run: |
           export HOME=/home/builder
           
-          # ARCHITECT OVERRIDE: The COMPLETE Compiler Bedrock
+          # The Bedrock
           ./build-package.sh -I -a aarch64 ndk-sysroot
           ./build-package.sh -I -a aarch64 libandroid-support
           ./build-package.sh -I -a aarch64 libandroid-glob
           ./build-package.sh -I -a aarch64 libiconv
           ./build-package.sh -I -a aarch64 libgmp
           
-          # NOW forge the master binary
+          # The Master Binary
           ./build-package.sh -I -a aarch64 coreutils
 
+      - name: The Autopsy (Catch the Crash)
+        if: failure()
+        run: |
+          echo "========== CONFIG.LOG AUTOPSY START =========="
+          cat /home/builder/.termux-build/coreutils/build/config.log
+          echo "========== CONFIG.LOG AUTOPSY END =========="
+
       - name: Upload Artifact
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: cl-andro-coreutils
