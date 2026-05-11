@@ -50,9 +50,12 @@ jobs:
       - name: Sanitize Artifact Filenames
         if: success()
         run: |
-          # Find any .deb file with a colon and replace the colon with an underscore
+          # Find any .deb file with a colon and replace it using standard 'tr'
           for f in output/*:*.deb; do
-            [ -e "$f" ] && mv "$f" "${f//:/_}"
+            if [ -e "$f" ]; then
+              new_name=$(echo "$f" | tr ':' '_')
+              mv "$f" "$new_name"
+            fi
           done
 
       - name: The Autopsy (Catch the Crash)
