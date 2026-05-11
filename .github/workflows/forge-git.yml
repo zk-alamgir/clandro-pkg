@@ -36,7 +36,7 @@ jobs:
           ./build-package.sh -I -a aarch64 zlib
           ./build-package.sh -I -a aarch64 openssl
           ./build-package.sh -I -a aarch64 libssh2
-          ./build-package.sh -I -a aarch64 nghttp2
+          ./build-package.sh -I -a aarch64 libnghttp2
           ./build-package.sh -I -a aarch64 libcurl
           
           # 3. Forge Git
