@@ -41,7 +41,10 @@ jobs:
           ./build-package.sh -I -a aarch64 libnghttp3
           ./build-package.sh -I -a aarch64 libcurl
           
-          # 3. Forge Git
+          # 3. Text Processing Bedrock
+          ./build-package.sh -I -a aarch64 pcre2
+          
+          # 4. Forge Git
           ./build-package.sh -I -a aarch64 git
 
       - name: The Autopsy (Catch the Crash)
