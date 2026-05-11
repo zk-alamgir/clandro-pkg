@@ -33,6 +33,7 @@ jobs:
           ./build-package.sh -I -a aarch64 libiconv
           
           # 2. Network & Crypto Bedrock (The Complete Modern Chain)
+          ./build-package.sh -I -a aarch64 ca-certificates
           ./build-package.sh -I -a aarch64 zlib
           ./build-package.sh -I -a aarch64 openssl
           ./build-package.sh -I -a aarch64 libssh2
