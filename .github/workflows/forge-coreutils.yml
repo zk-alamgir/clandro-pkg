@@ -23,10 +23,15 @@ jobs:
           export HOME=/home/builder
           ./scripts/setup-android-sdk.sh
 
-      - name: Forge Coreutils
+      - name: Forge Bedrock & Coreutils
         run: |
           export HOME=/home/builder
-          # The -I flag forces it to build any missing dependencies (like libgmp)
+          
+          # ARCHITECT OVERRIDE: The Compiler Bedrock (Required for linking C code)
+          ./build-package.sh -I -a aarch64 ndk-sysroot
+          ./build-package.sh -I -a aarch64 libandroid-support
+          
+          # NOW forge the master binary
           ./build-package.sh -I -a aarch64 coreutils
 
       - name: Upload Artifact
