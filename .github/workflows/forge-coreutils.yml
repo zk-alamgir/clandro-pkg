@@ -33,6 +33,7 @@ jobs:
           ./build-package.sh -I -a aarch64 libandroid-glob
           ./build-package.sh -I -a aarch64 libiconv
           ./build-package.sh -I -a aarch64 libgmp
+          ./build-package.sh -I -a aarch64 pcre2
           ./build-package.sh -I -a aarch64 libandroid-selinux
           
           # The Master Binary
