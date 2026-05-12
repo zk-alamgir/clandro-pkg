@@ -23,19 +23,19 @@ jobs:
           export HOME=/home/builder
           ./scripts/setup-android-sdk.sh
 
-      - name: Forge Node.js Bedrock
+      - name: Forge Core & Network Bedrock
         run: |
           export HOME=/home/builder
-          
-          # 1. The Core & Network Bedrock
           ./build-package.sh -I -a aarch64 ndk-sysroot
           ./build-package.sh -I -a aarch64 libandroid-support
           ./build-package.sh -I -a aarch64 libiconv
           ./build-package.sh -I -a aarch64 zlib
           ./build-package.sh -I -a aarch64 openssl
           ./build-package.sh -I -a aarch64 libnghttp2
-          
-          # 2. The V8 Engine Dependencies
+
+      - name: Forge V8 Engine Dependencies
+        run: |
+          export HOME=/home/builder
           ./build-package.sh -I -a aarch64 c-ares
           ./build-package.sh -I -a aarch64 libicu
           ./build-package.sh -I -a aarch64 tcl
@@ -43,9 +43,23 @@ jobs:
           ./build-package.sh -I -a aarch64 readline
           ./build-package.sh -I -a aarch64 libsqlite
           ./build-package.sh -I -a aarch64 libuv
+
+      - name: Forge The AI Runtime (Node.js)
+        run: |
+          export HOME=/home/builder
           
-          # 3. The AI Runtime Engine
+          # 1. Anti-Crash: Restrict the compiler to 2 processes to prevent RAM from exploding
+          export TERMUX_MAKE_PROCESSES=2
+          
+          # 2. Anti-Timeout: Start a background heartbeat every 2 minutes
+          while true; do echo "[HEARTBEAT] Still forging the V8 Engine... $(date)"; sleep 120; done &
+          HEARTBEAT_PID=$!
+          
+          # 3. Forge Node.js
           ./build-package.sh -I -a aarch64 nodejs
+          
+          # 4. Terminate the heartbeat when complete
+          kill $HEARTBEAT_PID
 
       - name: Sanitize Artifact Filenames
         if: success()
