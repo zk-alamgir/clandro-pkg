@@ -38,6 +38,7 @@ jobs:
           # 2. The V8 Engine Dependencies
           ./build-package.sh -I -a aarch64 c-ares
           ./build-package.sh -I -a aarch64 libicu
+          ./build-package.sh -I -a aarch64 tcl
           ./build-package.sh -I -a aarch64 libsqlite
           ./build-package.sh -I -a aarch64 libuv
           
