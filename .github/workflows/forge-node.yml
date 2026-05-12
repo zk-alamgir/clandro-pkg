@@ -1,0 +1,63 @@
+name: Forge Node (The AI Engine)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-node:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/termux/package-builder:latest
+      options: --privileged
+    steps:
+      - name: Checkout Sovereign Code
+        uses: actions/checkout@v4
+
+      - name: Architect the Custom OS Directories
+        run: |
+          sudo mkdir -p /data/data/com.zk.clandro/files/usr
+          sudo chown -R builder:builder /data/data/com.zk.clandro
+
+      - name: Install NDK
+        run: |
+          export HOME=/home/builder
+          ./scripts/setup-android-sdk.sh
+
+      - name: Forge Node.js Bedrock
+        run: |
+          export HOME=/home/builder
+          
+          # The Core & Network Bedrock (We reuse what we learned)
+          ./build-package.sh -I -a aarch64 ndk-sysroot
+          ./build-package.sh -I -a aarch64 libandroid-support
+          ./build-package.sh -I -a aarch64 libiconv
+          ./build-package.sh -I -a aarch64 zlib
+          ./build-package.sh -I -a aarch64 openssl
+          ./build-package.sh -I -a aarch64 libnghttp2
+          
+          # The AI Runtime Engine
+          ./build-package.sh -I -a aarch64 nodejs
+
+      - name: Sanitize Artifact Filenames
+        if: success()
+        run: |
+          for f in output/*:*.deb; do
+            if [ -e "$f" ]; then
+              new_name=$(echo "$f" | tr ':' '_')
+              mv "$f" "$new_name"
+            fi
+          done
+
+      - name: The Autopsy
+        if: failure()
+        run: |
+          echo "========== CONFIG.LOG AUTOPSY START =========="
+          find /home/builder/.termux-build/ -name "config.log" -exec cat {} +
+          echo "========== CONFIG.LOG AUTOPSY END =========="
+
+      - name: Upload Artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cl-andro-node
+          path: output/*.deb
