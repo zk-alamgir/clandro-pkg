@@ -27,7 +27,7 @@ jobs:
         run: |
           export HOME=/home/builder
           
-          # The Core & Network Bedrock (We reuse what we learned)
+          # 1. The Core & Network Bedrock
           ./build-package.sh -I -a aarch64 ndk-sysroot
           ./build-package.sh -I -a aarch64 libandroid-support
           ./build-package.sh -I -a aarch64 libiconv
@@ -35,7 +35,13 @@ jobs:
           ./build-package.sh -I -a aarch64 openssl
           ./build-package.sh -I -a aarch64 libnghttp2
           
-          # The AI Runtime Engine
+          # 2. The V8 Engine Dependencies
+          ./build-package.sh -I -a aarch64 c-ares
+          ./build-package.sh -I -a aarch64 libicu
+          ./build-package.sh -I -a aarch64 sqlite
+          ./build-package.sh -I -a aarch64 libuv
+          
+          # 3. The AI Runtime Engine
           ./build-package.sh -I -a aarch64 nodejs
 
       - name: Sanitize Artifact Filenames
