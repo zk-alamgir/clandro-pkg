@@ -26,6 +26,11 @@ jobs:
       - name: Forge Core & Network Bedrock
         run: |
           export HOME=/home/builder
+          
+          # 1. THE GLUE (Crucial for Node.js Linkage)
+          ./build-package.sh -I -a aarch64 libc++
+          
+          # 2. Bedrock Infrastructure
           ./build-package.sh -I -a aarch64 ndk-sysroot
           ./build-package.sh -I -a aarch64 libandroid-support
           ./build-package.sh -I -a aarch64 libiconv
@@ -48,22 +53,23 @@ jobs:
         run: |
           export HOME=/home/builder
           
-          # 1. Anti-Crash: Restrict the compiler to 2 processes to prevent RAM from exploding
+          # Anti-Crash: Restrict the compiler to 2 processes to prevent RAM exhaustion
           export TERMUX_MAKE_PROCESSES=2
           
-          # 2. Anti-Timeout: Start a background heartbeat every 2 minutes
+          # Anti-Timeout: Start a background heartbeat to keep GitHub Actions alive
           while true; do echo "[HEARTBEAT] Still forging the V8 Engine... $(date)"; sleep 120; done &
           HEARTBEAT_PID=$!
           
-          # 3. Forge Node.js
+          # Forge Node.js
           ./build-package.sh -I -a aarch64 nodejs
           
-          # 4. Terminate the heartbeat when complete
+          # Terminate heartbeat when complete
           kill $HEARTBEAT_PID
 
       - name: Sanitize Artifact Filenames
         if: success()
         run: |
+          # Replace illegal colons (:) with underscores for NTFS/Windows compatibility
           for f in output/*:*.deb; do
             if [ -e "$f" ]; then
               new_name=$(echo "$f" | tr ':' '_')
