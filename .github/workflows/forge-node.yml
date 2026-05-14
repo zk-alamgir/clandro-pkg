@@ -66,6 +66,42 @@ jobs:
           # Terminate heartbeat when complete
           kill $HEARTBEAT_PID
 
+      - name: Inject NPM (The JavaScript Payload)
+        if: success()
+        run: |
+          echo "Packaging the official NPM files into a custom .deb..."
+          
+          # 1. Create the skeleton structure for the .deb suitcase
+          mkdir -p npm-payload/data/data/com.zk.clandro/files/usr/lib
+          mkdir -p npm-payload/data/data/com.zk.clandro/files/usr/bin
+          mkdir -p npm-payload/DEBIAN
+          
+          # 2. Download and extract the official Node tarball
+          wget https://nodejs.org/dist/v20.12.2/node-v20.12.2-linux-arm64.tar.xz
+          tar -xf node-v20.12.2-linux-arm64.tar.xz
+          
+          # 3. Move the node_modules folder into our suitcase
+          cp -r node-v20.12.2-linux-arm64/lib/node_modules npm-payload/data/data/com.zk.clandro/files/usr/lib/
+          
+          # 4. Generate the executable wrapper script directly inside the suitcase!
+          cat << 'EOF' > npm-payload/data/data/com.zk.clandro/files/usr/bin/npm
+          #!/data/data/com.zk.clandro/files/usr/bin/bash
+          exec node /data/data/com.zk.clandro/files/usr/lib/node_modules/npm/bin/npm-cli.js "$@"
+          EOF
+          chmod +x npm-payload/data/data/com.zk.clandro/files/usr/bin/npm
+          
+          # 5. Create the required Debian metadata file
+          cat << 'EOF' > npm-payload/DEBIAN/control
+          Package: npm-patch
+          Version: 1.0.0
+          Architecture: aarch64
+          Maintainer: Architect
+          Description: NPM JavaScript Payload for Cl-Andro
+          EOF
+          
+          # 6. Build the actual .deb file and drop it in the output folder
+          dpkg-deb --build npm-payload output/npm-patch_1:1.0.0_aarch64.deb
+
       - name: Sanitize Artifact Filenames
         if: success()
         run: |
