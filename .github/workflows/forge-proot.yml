@@ -1,0 +1,61 @@
+name: Forge PRoot (The Sub-System)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-proot:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/termux/package-builder:latest
+      options: --privileged
+    steps:
+      - name: Checkout Sovereign Code
+        uses: actions/checkout@v4
+
+      - name: Architect the Custom OS Directories
+        run: |
+          sudo mkdir -p /data/data/com.zk.clandro/files/usr
+          sudo chown -R builder:builder /data/data/com.zk.clandro
+
+      - name: Install NDK
+        run: |
+          export HOME=/home/builder
+          ./scripts/setup-android-sdk.sh
+
+      - name: Forge PRoot & Distro Manager
+        run: |
+          export HOME=/home/builder
+          
+          # 1. PRoot Dependencies
+          ./build-package.sh -I -a aarch64 talloc
+          
+          # 2. The PRoot Engine
+          ./build-package.sh -I -a aarch64 proot
+          
+          # 3. The Distro Manager
+          ./build-package.sh -I -a aarch64 proot-distro
+
+      - name: Sanitize Artifact Filenames
+        if: success()
+        run: |
+          for f in output/*:*.deb; do
+            if [ -e "$f" ]; then
+              new_name=$(echo "$f" | tr ':' '_')
+              mv "$f" "$new_name"
+            fi
+          done
+
+      - name: The Autopsy
+        if: failure()
+        run: |
+          echo "========== CONFIG.LOG AUTOPSY START =========="
+          find /home/builder/.termux-build/ -name "config.log" -exec cat {} +
+          echo "========== CONFIG.LOG AUTOPSY END =========="
+
+      - name: Upload Artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cl-andro-proot
+          path: output/*.deb
