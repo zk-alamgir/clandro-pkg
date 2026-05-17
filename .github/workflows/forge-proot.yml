@@ -28,7 +28,7 @@ jobs:
           export HOME=/home/builder
           
           # 1. PRoot Dependencies
-          ./build-package.sh -I -a aarch64 talloc
+          ./build-package.sh -I -a aarch64 libtalloc
           
           # 2. The PRoot Engine
           ./build-package.sh -I -a aarch64 proot
