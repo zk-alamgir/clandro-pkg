@@ -51,6 +51,7 @@ jobs:
           ./build-package.sh -I -a aarch64 file
           ./build-package.sh -I -a aarch64 findutils
           ./build-package.sh -I -a aarch64 grep
+          ./build-package.sh -I -a aarch64 ncurses
           ./build-package.sh -I -a aarch64 util-linux
           ./build-package.sh -I -a aarch64 libssh2
           ./build-package.sh -I -a aarch64 libnghttp3
@@ -67,6 +68,7 @@ jobs:
           ./build-package.sh -I -a aarch64 libtalloc
           ./build-package.sh -I -a aarch64 proot
           ./build-package.sh -I -a aarch64 proot-distro
+        
 
       - name: Sanitize Artifact Filenames
         if: success()
