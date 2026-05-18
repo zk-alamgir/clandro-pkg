@@ -39,7 +39,7 @@ jobs:
         run: |
           export HOME=/home/builder
           
-          # 1. The Core Security, Regex, & Android Hardware Layer (PREVENTS LINKER CRASHES)
+          # 1. The Core Security, Regex, & Android Hardware Layer
           ./build-package.sh -I -a aarch64 pcre2
           ./build-package.sh -I -a aarch64 attr
           ./build-package.sh -I -a aarch64 libacl
@@ -48,12 +48,13 @@ jobs:
           ./build-package.sh -I -a aarch64 libcap-ng
           ./build-package.sh -I -a aarch64 libandroid-selinux
           
-          # 2. Distro Manager Prerequisites (The Core Utilities & Network Toolchain)
+          # 2. Distro Manager Prerequisites (The Master Core Utilities)
           ./build-package.sh -I -a aarch64 gawk
           ./build-package.sh -I -a aarch64 file
           ./build-package.sh -I -a aarch64 findutils
           ./build-package.sh -I -a aarch64 grep
           ./build-package.sh -I -a aarch64 sed
+          ./build-package.sh -I -a aarch64 unzip
           ./build-package.sh -I -a aarch64 ncurses
           ./build-package.sh -I -a aarch64 util-linux
           ./build-package.sh -I -a aarch64 libssh2
@@ -61,13 +62,19 @@ jobs:
           ./build-package.sh -I -a aarch64 libngtcp2
           ./build-package.sh -I -a aarch64 libcurl
           
-          # 3. The Compression Toolchain
+          # 3. The Advanced System Foundations (Guarantees Installation Capabilities)
+          ./build-package.sh -I -a aarch64 readline
+          ./build-package.sh -I -a aarch64 bash
+          ./build-package.sh -I -a aarch64 libgmp
+          ./build-package.sh -I -a aarch64 coreutils
+          
+          # 4. The Compression Toolchain
           ./build-package.sh -I -a aarch64 libbz2
           ./build-package.sh -I -a aarch64 liblzma
           ./build-package.sh -I -a aarch64 gzip
           ./build-package.sh -I -a aarch64 tar
           
-          # 4. The PRoot Engine & Manager
+          # 5. The PRoot Engine & Manager
           ./build-package.sh -I -a aarch64 libtalloc
           ./build-package.sh -I -a aarch64 proot
           ./build-package.sh -I -a aarch64 proot-distro
