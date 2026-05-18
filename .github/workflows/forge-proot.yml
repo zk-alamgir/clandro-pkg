@@ -39,7 +39,14 @@ jobs:
         run: |
           export HOME=/home/builder
           
-          # 1. Distro Manager Prerequisites (The Core Utilities & Network Toolchain)
+          # 1. The Core Security & Regex Engine (MUST BE FIRST TO PREVENT POISONING)
+          ./build-package.sh -I -a aarch64 pcre2
+          ./build-package.sh -I -a aarch64 attr
+          ./build-package.sh -I -a aarch64 libacl
+          ./build-package.sh -I -a aarch64 libandroid-glob
+          ./build-package.sh -I -a aarch64 libandroid-selinux
+          
+          # 2. Distro Manager Prerequisites (The Core Utilities & Network Toolchain)
           ./build-package.sh -I -a aarch64 gawk
           ./build-package.sh -I -a aarch64 file
           ./build-package.sh -I -a aarch64 findutils
@@ -49,17 +56,10 @@ jobs:
           ./build-package.sh -I -a aarch64 libngtcp2
           ./build-package.sh -I -a aarch64 libcurl
           
-          # 2. The Compression, Regex, & Android Security Toolchain
-          ./build-package.sh -I -a aarch64 pcre2
-          ./build-package.sh -I -a aarch64 attr
-          ./build-package.sh -I -a aarch64 libacl
-          ./build-package.sh -I -a aarch64 libandroid-glob
-          ./build-package.sh -I -a aarch64 libandroid-selinux
+          # 3. The Compression Toolchain
           ./build-package.sh -I -a aarch64 libbz2
           ./build-package.sh -I -a aarch64 liblzma
           ./build-package.sh -I -a aarch64 gzip
-          
-          # 3. The Master Archiver
           ./build-package.sh -I -a aarch64 tar
           
           # 4. The PRoot Engine & Manager
