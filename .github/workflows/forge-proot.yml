@@ -39,11 +39,13 @@ jobs:
         run: |
           export HOME=/home/builder
           
-          # 1. The Core Security & Regex Engine (MUST BE FIRST TO PREVENT POISONING)
+          # 1. The Core Security, Regex, & Android Hardware Layer (PREVENTS LINKER CRASHES)
           ./build-package.sh -I -a aarch64 pcre2
           ./build-package.sh -I -a aarch64 attr
           ./build-package.sh -I -a aarch64 libacl
           ./build-package.sh -I -a aarch64 libandroid-glob
+          ./build-package.sh -I -a aarch64 libandroid-posix-semaphore
+          ./build-package.sh -I -a aarch64 libcap-ng
           ./build-package.sh -I -a aarch64 libandroid-selinux
           
           # 2. Distro Manager Prerequisites (The Core Utilities & Network Toolchain)
@@ -68,7 +70,6 @@ jobs:
           ./build-package.sh -I -a aarch64 libtalloc
           ./build-package.sh -I -a aarch64 proot
           ./build-package.sh -I -a aarch64 proot-distro
-        
 
       - name: Sanitize Artifact Filenames
         if: success()
