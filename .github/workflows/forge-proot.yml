@@ -46,7 +46,8 @@ jobs:
           ./build-package.sh -I -a aarch64 libngtcp2
           ./build-package.sh -I -a aarch64 libcurl
           
-          # 2. The Compression Toolchain (MUST BE BUILT BEFORE TAR)
+          # 2. The Compression & Regex Toolchain
+          ./build-package.sh -I -a aarch64 pcre2
           ./build-package.sh -I -a aarch64 libbz2
           ./build-package.sh -I -a aarch64 liblzma
           ./build-package.sh -I -a aarch64 gzip
@@ -69,12 +70,15 @@ jobs:
             fi
           done
 
-      - name: The Autopsy
+      - name: The Precision Autopsy
         if: failure()
         run: |
-          echo "========== CONFIG.LOG AUTOPSY START =========="
-          find /home/builder/.termux-build/ -name "config.log" -exec cat {} +
-          echo "========== CONFIG.LOG AUTOPSY END =========="
+          echo "========== CRASH ISOLATION START =========="
+          # Find the most recently modified config.log (the one that actually crashed)
+          CRASH_LOG=$(find /home/builder/.termux-build/ -name "config.log" -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2-)
+          echo "Analyzing failed log at: $CRASH_LOG"
+          tail -n 100 "$CRASH_LOG"
+          echo "========== CRASH ISOLATION END =========="
 
       - name: Upload Artifact
         if: success()
