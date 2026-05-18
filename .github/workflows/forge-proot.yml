@@ -48,7 +48,7 @@ jobs:
           
           # 2. The Compression Toolchain (MUST BE BUILT BEFORE TAR)
           ./build-package.sh -I -a aarch64 libbz2
-          ./build-package.sh -I -a aarch64 xz-utils
+          ./build-package.sh -I -a aarch64 liblzma
           ./build-package.sh -I -a aarch64 gzip
           
           # 3. The Master Archiver
