@@ -48,33 +48,35 @@ jobs:
           ./build-package.sh -I -a aarch64 libcap-ng
           ./build-package.sh -I -a aarch64 libandroid-selinux
           
-          # 2. The Core Compression Libraries (MUST BE BUILT BEFORE UNZIP)
+          # 2. The Terminal & Input Engine (MUST BE BUILT BEFORE GAWK/UTILS)
+          ./build-package.sh -I -a aarch64 ncurses
+          ./build-package.sh -I -a aarch64 readline
+          
+          # 3. The Core Compression Libraries
           ./build-package.sh -I -a aarch64 libbz2
           ./build-package.sh -I -a aarch64 liblzma
           
-          # 3. Distro Manager Prerequisites (The Master Core Utilities)
+          # 4. Distro Manager Prerequisites (The Master Core Utilities)
           ./build-package.sh -I -a aarch64 gawk
           ./build-package.sh -I -a aarch64 file
           ./build-package.sh -I -a aarch64 findutils
           ./build-package.sh -I -a aarch64 grep
           ./build-package.sh -I -a aarch64 sed
           ./build-package.sh -I -a aarch64 unzip
-          ./build-package.sh -I -a aarch64 ncurses
           ./build-package.sh -I -a aarch64 util-linux
           ./build-package.sh -I -a aarch64 libssh2
           ./build-package.sh -I -a aarch64 libnghttp3
           ./build-package.sh -I -a aarch64 libngtcp2
           ./build-package.sh -I -a aarch64 libcurl
           
-          # 4. The Advanced System Foundations & Archivers
-          ./build-package.sh -I -a aarch64 readline
+          # 5. The Advanced System Foundations & Archivers
           ./build-package.sh -I -a aarch64 bash
           ./build-package.sh -I -a aarch64 libgmp
           ./build-package.sh -I -a aarch64 coreutils
           ./build-package.sh -I -a aarch64 gzip
           ./build-package.sh -I -a aarch64 tar
           
-          # 5. The PRoot Engine & Manager
+          # 6. The PRoot Engine & Manager
           ./build-package.sh -I -a aarch64 libtalloc
           ./build-package.sh -I -a aarch64 proot
           ./build-package.sh -I -a aarch64 proot-distro
