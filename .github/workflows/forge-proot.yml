@@ -27,13 +27,19 @@ jobs:
         run: |
           export HOME=/home/builder
           
-          # 1. PRoot Dependencies
+          # 1. Distro Manager Prerequisites (The Parsing & Download Toolchain)
+          ./build-package.sh -I -a aarch64 gawk
+          ./build-package.sh -I -a aarch64 curl
+          ./build-package.sh -I -a aarch64 tar
+          ./build-package.sh -I -a aarch64 xz-utils
+          
+          # 2. PRoot Dependencies
           ./build-package.sh -I -a aarch64 libtalloc
           
-          # 2. The PRoot Engine
+          # 3. The PRoot Engine
           ./build-package.sh -I -a aarch64 proot
           
-          # 3. The Distro Manager
+          # 4. The Distro Manager
           ./build-package.sh -I -a aarch64 proot-distro
 
       - name: Sanitize Artifact Filenames
