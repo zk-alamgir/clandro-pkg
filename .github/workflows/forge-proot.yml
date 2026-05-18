@@ -47,7 +47,7 @@ jobs:
           ./build-package.sh -I -a aarch64 libcurl
           
           # 2. The Compression Toolchain (MUST BE BUILT BEFORE TAR)
-          ./build-package.sh -I -a aarch64 bzip2
+          ./build-package.sh -I -a aarch64 libbz2
           ./build-package.sh -I -a aarch64 xz-utils
           ./build-package.sh -I -a aarch64 gzip
           
